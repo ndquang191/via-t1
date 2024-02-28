@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-const SignUpForm = () => {
+const SignUpForm = ({ setTab }) => {
 	const [info, setInfo] = useState({
 		username: "",
 		password: "",
 		email: "",
+		repeatpassword: "",
 	});
 
 	function checkRegex(info) {
@@ -12,12 +13,11 @@ const SignUpForm = () => {
 
 		let passwordRegx = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()-_=+{};:'",.<>?/\\|]).{6,}$/;
 
-		console.log(info);
 		let err = {
-			username: usernameRegx.test(info.username),
-			password: passwordRegx.test(info.password),
-			email: info.email.includes("@"),
-			repeatpassword: info.password === info.repeatpassword,
+			username: usernameRegx.test(info.username) ? null : "5-15 kí tự, chỉ chứa số và chữ",
+			password: passwordRegx.test(info.password) ? null : "Ít nhất 6 kí tự",
+			email: info.email.includes("@") ? null : "Không phải email hợp lệ",
+			repeatpassword: info.password === info.repeatpassword ? null : "Không trùng password cũ",
 		};
 
 		return err;
@@ -35,14 +35,19 @@ const SignUpForm = () => {
 
 		let err = checkRegex(info);
 
-
 		// if( err.email == true)
+
+		if (err.username || err.email || err.password || err.repeatpassword) {
+			setInfo(err);
+			return;
+		}
 
 		// xuwr ly loi
 
 		let data = JSON.stringify({ username: e.target.username.value, password: e.target.password.value });
 
 		sessionStorage.setItem("info", data);
+		setTab(true);
 	}
 	return (
 		<div className="flex justify-center items-center px-1 pb-6">
@@ -54,9 +59,10 @@ const SignUpForm = () => {
 					type="text"
 					id="username"
 					name="username"
-					className="block border-solid border-2 border-grey-light mb-4 p-1"
+					className="block border-solid border-2 border-grey-light  p-1"
 					required
 				/>
+				<div className="text-red-600 min-w-4 mb-4">{info.username}</div>
 
 				<label htmlFor="email" className="block font-medium">
 					Email
@@ -65,9 +71,10 @@ const SignUpForm = () => {
 					type="text"
 					id="email"
 					name="email"
-					className="block border-solid border-2 border-grey-light mb-4 p-1"
+					className="block border-solid border-2 border-grey-light p-1"
 					required
 				/>
+				<div className="text-red-600 min-w-4 mb-4">{info.email}</div>
 
 				<label htmlFor="password" className="block font-medium">
 					Password
@@ -76,9 +83,10 @@ const SignUpForm = () => {
 					type="password"
 					id="password"
 					name="password"
-					className="block border-solid border-2 border-grey-light mb-4 p-1"
+					className="block border-solid border-2 border-grey-light p-1"
 					required
 				/>
+				<div className="text-red-600 min-w-4 mb-4">{info.password}</div>
 
 				<label htmlFor="repeatpassword" className="block font-medium">
 					Confirm Password
@@ -87,9 +95,11 @@ const SignUpForm = () => {
 					type="password"
 					id="repeatpassword"
 					name="repeatpassword"
-					className="block border-solid border-2 border-grey-light mb-4 p-1"
+					className="block border-solid border-2 border-grey-light p-1"
 					required
 				/>
+
+				<div className="text-red-600 min-w-4 mb-4">{info.repeatpassword}</div>
 
 				<button
 					type="submit"
